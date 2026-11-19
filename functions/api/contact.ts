@@ -47,7 +47,7 @@ export const onRequestPost = async ({
     return json({ error: "Message must be between 5 and 5000 characters." }, 400);
 
   if (!env.RESEND_API_KEY || !env.CONTACT_TO) {
-    return json({ error: `Not configured. Missing: ${[!env.RESEND_API_KEY && "RESEND_API_KEY", !env.CONTACT_TO && "CONTACT_TO"].filter(Boolean).join(", ")}. Env names seen: ${Object.keys(env).join(", ") || "(none)"}` }, 503);
+    return json({ error: "Contact form is not configured yet." }, 503);
   }
 
   const res = await fetch("https://api.resend.com/emails", {
