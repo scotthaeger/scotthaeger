@@ -4,7 +4,6 @@ export const site = {
   name: "Scott Haeger",
   role: "Full Stack Developer",
   location: "Asheville, NC",
-  email: "scottahaeger@gmail.com",
   headline: "Systems that run the business, built to keep running.",
   summary:
     "Software engineering lead and project manager with 20+ years designing, building, and operating business-critical systems. 11 years of technical ownership of a multi-tenant CRM/ERP serving 65+ franchise locations, with hands-on depth in third-party integrations, AWS operations, security hardening, and AI agent infrastructure.",

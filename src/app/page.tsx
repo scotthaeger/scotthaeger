@@ -7,6 +7,7 @@ import {
   skills,
   education,
 } from "@/content/site";
+import ContactForm from "./ContactForm";
 
 const nav = [
   ["01", "Portfolio", "#portfolio"],
@@ -159,12 +160,7 @@ export default function Home() {
         <section className="py-12">
           <SectionHead n="04" title="Contact" id="contact" />
           <div className="panel p-5">
-            <p className="text-[var(--dim)]">
-              <span className="text-[var(--accent)]">$</span> mail{" "}
-              <a className="text-[var(--accent2)] underline underline-offset-4" href={`mailto:${site.email}`}>
-                {site.email}
-              </a>
-            </p>
+            <ContactForm />
           </div>
         </section>
       </main>
