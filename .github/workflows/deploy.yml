@@ -1,0 +1,61 @@
+name: Deploy
+
+# Pull requests get a private PREVIEW deployment (a link posted on the PR).
+# Merging to `main` publishes to PRODUCTION (the live site).
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - run: npm ci
+
+      - run: npm run build
+
+      - name: Deploy to Cloudflare Pages
+        id: deploy
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          # head_ref is set on pull requests (the source branch -> preview);
+          # on push to main it's empty, so ref_name ("main") -> production.
+          command: >-
+            pages deploy out
+            --project-name=scotthaeger
+            --branch=${{ github.head_ref || github.ref_name }}
+
+      - name: Post preview link on the PR
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const url = "${{ steps.deploy.outputs.deployment-url }}";
+            const body = [
+              "### 🔎 Preview is ready",
+              "",
+              `**[Open the preview of this change](${url})**`,
+              "",
+              "Take a look. If it's good, click **Merge pull request** below to publish it to the live site. If not, tell Claude Code what to fix.",
+            ].join("\n");
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body,
+            });

@@ -1,0 +1,28 @@
+{
+  "name": "scotthaeger",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Personal portfolio and resume site for Scott Haeger.",
+  "scripts": {
+    "prepare": "git config core.hooksPath .githooks || true",
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "preview": "npx serve@latest out",
+    "deploy": "npm run build && npx wrangler@latest pages deploy out --project-name=scotthaeger --branch=main"
+  },
+  "dependencies": {
+    "next": "^15.1.6",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.0.0",
+    "@types/node": "^22.10.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "tailwindcss": "^4.0.0",
+    "typescript": "^5.7.0"
+  }
+}
