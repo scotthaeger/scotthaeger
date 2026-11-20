@@ -50,21 +50,33 @@ export const onRequestPost = async ({
     return json({ error: "Contact form is not configured yet." }, 503);
   }
 
-  const res = await fetch("https://api.resend.com/emails", {
-    method: "POST",
-    headers: {
-      authorization: `Bearer ${env.RESEND_API_KEY}`,
-      "content-type": "application/json",
-    },
-    body: JSON.stringify({
-      from: env.CONTACT_FROM || "Site contact <onboarding@resend.dev>",
-      to: [env.CONTACT_TO],
-      reply_to: email,
-      subject: `Site contact from ${name.replace(/[\r\n]+/g, " ")}`,
-      text: `Name: ${name}\nEmail: ${email}\n\n${message}`,
-    }),
-  });
+  const fail = () =>
+    // Not 502/504: Cloudflare replaces those with its own error page, hiding our JSON.
+    json({ error: "Could not send your message. Please try again later." }, 500);
 
-  if (!res.ok) return json({ error: "Could not send your message. Please try again later." }, 502);
+  try {
+    const res = await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: {
+        authorization: `Bearer ${env.RESEND_API_KEY}`,
+        "content-type": "application/json",
+      },
+      body: JSON.stringify({
+        from: env.CONTACT_FROM || "Site contact <onboarding@resend.dev>",
+        to: [env.CONTACT_TO],
+        reply_to: email,
+        subject: `Site contact from ${name.replace(/[\r\n]+/g, " ")}`,
+        text: `Name: ${name}\nEmail: ${email}\n\n${message}`,
+      }),
+    });
+
+    if (!res.ok) {
+      console.error("Resend rejected message", res.status, await res.text());
+      return fail();
+    }
+  } catch (err) {
+    console.error("Resend request failed", err);
+    return fail();
+  }
   return json({ ok: true });
 };
